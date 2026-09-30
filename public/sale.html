@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kassa - Do'kon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/common.css">
+<style>
+.pos{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:1.5rem;align-items:start}
+.today-pill{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.55rem 1rem;text-align:right}
+.today-pill span{display:block;font-size:.78rem;color:var(--muted)}
+.today-pill b{font:700 1.1rem var(--display)}
+
+.bigsearch{display:flex;align-items:center;gap:.7rem;background:#fff;border:2px solid var(--line);border-radius:16px;padding:.85rem 1.1rem;margin-bottom:.9rem}
+.bigsearch:focus-within{border-color:var(--brass)}
+.bigsearch svg{width:22px;height:22px;color:var(--muted);flex:none}
+.bigsearch input{border:0;outline:0;background:none;font:600 1.15rem var(--display);width:100%;min-width:0}
+.bigsearch input::placeholder{font-weight:400;color:#93a29c}
+.cats{margin-bottom:1rem}
+
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:.8rem}
+.pc{position:relative;text-align:left;background:#fff;border:1px solid var(--line);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;min-height:124px;transition:border-color .15s,transform .1s}
+.pc:hover{border-color:var(--brass)}
+.pc:active{transform:scale(.98)}
+.pc .nm{font-weight:600;line-height:1.25;overflow-wrap:anywhere;padding-right:1.6rem}
+.pc .ct{font-size:.78rem;color:var(--muted)}
+.pc .pr{margin-top:auto;font:800 1.2rem var(--display);letter-spacing:-.01em}
+.pc .st{font-size:.78rem;color:var(--muted)}
+.pc.low .st{color:var(--danger);font-weight:600}
+.pc:disabled{opacity:.45;cursor:not-allowed}
+.pc .inc{position:absolute;top:.6rem;right:.6rem;min-width:24px;height:24px;padding:0 .4rem;border-radius:99px;background:var(--brass);color:var(--ink);font-size:.8rem;font-weight:700;display:grid;place-items:center}
+
+.cart{position:sticky;top:1.25rem;background:var(--pine);color:#fff;border-radius:22px;padding:1.25rem;display:flex;flex-direction:column;max-height:calc(100vh - 2.5rem);max-height:calc(100dvh - 2.5rem)}
+.cart-head{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.cart-head h2{font-size:1.15rem}
+.cart-head small{color:#9FB5AD;margin-left:.4rem;font-weight:400}
+.linkbtn{background:none;border:0;color:#9FB5AD;font-size:.85rem;text-decoration:underline;padding:.2rem}
+.linkbtn:hover{color:#fff}
+.cart-items{overflow:auto;margin:.8rem -.25rem .6rem;padding:0 .25rem;flex:1;min-height:90px}
+.cart-empty{color:#9FB5AD;padding:1.5rem .25rem;text-align:center}
+.ci{padding:.8rem 0;border-top:1px solid rgba(255,255,255,.12)}
+.ci:first-child{border-top:0}
+.ci-top{display:flex;justify-content:space-between;gap:.5rem;align-items:flex-start}
+.ci-top b{font-weight:600;overflow-wrap:anywhere}
+.x{background:none;border:0;color:#9FB5AD;font-size:1.3rem;line-height:1;padding:0 .25rem}
+.x:hover{color:#F5A08D}
+.ci-row{display:flex;align-items:center;gap:.45rem;margin-top:.55rem;flex-wrap:wrap}
+.ci-row .op{color:#9FB5AD}
+.qs{display:flex;align-items:stretch}
+.qs button{width:34px;background:rgba(255,255,255,.1);border:0;color:#fff;font-size:1.1rem}
+.qs button:first-child{border-radius:8px 0 0 8px}
+.qs button:last-child{border-radius:0 8px 8px 0}
+.qs button:hover{background:rgba(255,255,255,.18)}
+.qi{width:58px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;padding:.4rem .3rem;text-align:center;font-weight:600;border-radius:0}
+.qs .qi{border-left:0;border-right:0}
+.qi.pi{width:92px;border-radius:8px}
+.qi:focus{outline:0;border-color:var(--brass)}
+.lt{margin-left:auto;font-weight:700}
+.cart-foot{border-top:1px solid rgba(255,255,255,.15);padding-top:1rem}
+.tot{display:flex;justify-content:space-between;align-items:baseline;gap:.5rem}
+.tot span{color:#9FB5AD}
+.tot b{font:800 clamp(1.5rem,3vw,2rem) var(--display);letter-spacing:-.02em;overflow-wrap:anywhere;text-align:right}
+.pay{width:100%;margin-top:.9rem;padding:1rem;font-size:1.05rem;border-radius:14px}
+
+.recent{margin-top:1.75rem}
+.recent .tr{grid-template-columns:70px minmax(0,1fr) minmax(110px,auto) auto}
+.recent .items{color:var(--muted);font-size:.9rem;overflow-wrap:anywhere}
+
+.head-right{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.paper-wrap{background:#E4EAE7;border-radius:14px;padding:1rem;display:flex;justify-content:center;max-height:60vh;overflow:auto}
+.rc{background:#fff;color:#000;font:13px/1.35 "Courier New",ui-monospace,monospace;width:100%;max-width:300px;padding:1rem .9rem;box-shadow:0 4px 14px rgba(8,25,21,.15)}
+.rc-h{text-align:center}
+.rc-h b{display:block;font-size:1.15em;margin-bottom:.15rem;text-transform:none}
+.rc hr{border:0;border-top:1px dashed #000;margin:.55rem 0}
+.rc-row{display:flex;justify-content:space-between;gap:.6rem}
+.rc-item{margin-bottom:.35rem}
+.rc-item>div:first-child{overflow-wrap:anywhere}
+.rc-total{font-weight:700;font-size:1.1em}
+.rc-f{text-align:center}
+.chk{display:flex;align-items:center;gap:.6rem;color:var(--ink);font-size:.95rem;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--pine)}
+#printArea{display:none}
+@media print{
+  html,body{background:#fff!important}
+  .app,dialog,.fab,#toast{display:none!important}
+  #printArea{display:block}
+  #printArea .rc{box-shadow:none;max-width:none;padding:0;font-size:12px}
+}
+.fab{display:none}
+@media (max-width:1050px){
+  .pos{grid-template-columns:1fr}
+  .cart{position:static;max-height:none}
+}
+@media (max-width:860px){
+  .fab{position:fixed;left:1rem;right:1rem;bottom:calc(4.6rem + env(safe-area-inset-bottom));z-index:25;justify-content:space-between;padding:.9rem 1.1rem;border-radius:14px;box-shadow:0 10px 30px rgba(8,25,21,.3)}
+  .fab:not([hidden]){display:flex}
+  .recent .tr{grid-template-columns:1fr auto}
+  .recent .items{grid-column:1/-1}
+  .main{padding-bottom:9rem}
+}
+</style>
+</head>
+<body data-page="sale">
+<div class="app">
+<aside class="side" id="side"></aside>
+<main class="main">
+
+  <div class="page-head">
+    <div><h1>Kassa</h1><p class="sub">Tovarni bosing yoki nomini yozing, keyin "Sotish" ni bosing.</p></div>
+    <div class="head-right">
+      <button class="btn sm" id="settingsBtn">Chek sozlamalari</button>
+      <div class="today-pill"><span>Bugungi tushum</span><b id="todayRev">0 so'm</b></div>
+    </div>
+  </div>
+
+  <div class="pos">
+    <section>
+      <label class="bigsearch" for="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="search" type="search" placeholder="Tovar nomi" autocomplete="off" autofocus aria-label="Tovar qidirish">
+      </label>
+      <div class="chips cats" id="cats"></div>
+      <div class="pgrid" id="grid"></div>
+    </section>
+
+    <aside class="cart" id="cart" aria-label="Savat">
+      <div class="cart-head"><h2>Savat<small id="cartCount"></small></h2><button class="linkbtn" id="clearBtn">Tozalash</button></div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-foot">
+        <div class="tot"><span>Jami</span><b id="cartTotal">0 so'm</b></div>
+        <button class="btn brass pay" id="payBtn" disabled>Sotish</button>
+      </div>
+    </aside>
+  </div>
+
+  <section class="recent">
+    <div class="page-head" style="margin-bottom:.8rem"><h2>Bugungi sotuvlar</h2></div>
+    <div class="tbl"><div id="recent"></div></div>
+  </section>
+
+</main>
+</div>
+
+<button class="btn brass fab" id="fab" hidden><span id="fabTxt"></span><span>Savatga o'tish</span></button>
+<dialog id="dlgReceipt"><div class="dlg">
+  <h2>Chek</h2>
+  <p class="hint" id="rcHint">Sotuv tayyor. Chek chiqarish uchun "Chop etish" ni bosing.</p>
+  <div class="paper-wrap"><div id="rcPreview" style="width:100%;display:flex;justify-content:center"></div></div>
+  <div class="foot"><button type="button" class="btn" data-close>Yopish</button><button type="button" class="btn brass" id="printBtn">Chop etish</button></div>
+</div></dialog>
+
+<dialog id="dlgSettings"><form class="dlg" id="fSettings" autocomplete="off">
+  <h2>Chek sozlamalari</h2>
+  <p class="hint">Bu ma'lumotlar chekning tepasida va pastida chiqadi. Faqat shu qurilmada saqlanadi.</p>
+  <div class="grid2">
+    <div class="full"><label for="setName">Do'kon nomi</label><input class="inp" id="setName" maxlength="60" required></div>
+    <div class="full"><label for="setAddr">Manzil</label><input class="inp" id="setAddr" maxlength="120" placeholder="Toshkent sh., ..."></div>
+    <div><label for="setPhone">Telefon</label><input class="inp" id="setPhone" maxlength="40" placeholder="+998 90 123 45 67"></div>
+    <div><label for="setHours">Ish vaqti</label><input class="inp" id="setHours" maxlength="40" placeholder="09:00 - 21:00"></div>
+    <div class="full"><label for="setFooter">Chek oxiridagi yozuv</label><input class="inp" id="setFooter" maxlength="120"></div>
+    <div><label for="setWidth">Qog'oz kengligi</label><select class="inp" id="setWidth"><option value="80">80 mm</option><option value="58">58 mm</option></select></div>
+    <div style="display:flex;align-items:flex-end"><label class="chk" style="margin:0 0 .65rem"><input type="checkbox" id="setAuto"> Sotgandan keyin darrov chop etish</label></div>
+  </div>
+  <div class="foot"><button type="button" class="btn" data-close>Bekor qilish</button><button class="btn solid">Saqlash</button></div>
+</form></dialog>
+
+<div id="printArea" aria-hidden="true"></div>
+<style id="pageStyle"></style>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="/common.js"></script>
+<script>
+let products = [], sales = [], cat = 'all', q = '';
+let cart = loadCart();
+
+function loadCart() { try { return JSON.parse(localStorage.getItem('dokon_cart')) || {}; } catch { return {}; } }
+function saveCart() { try { localStorage.setItem('dokon_cart', JSON.stringify(cart)); } catch {} }
+
+async function refresh() {
+  try {
+    [products, sales] = await Promise.all([api('/api/products'), api('/api/sales?limit=400')]);
+    reconcile();
+    renderAll();
+  } catch (e) { toast(e.message, true); }
+}
+
+function reconcile() {
+  for (const id of Object.keys(cart)) {
+    const p = products.find((x) => x._id === id);
+    if (!p || p.quantity <= 0) { delete cart[id]; continue; }
+    cart[id].name = p.name; cart[id].max = p.quantity;
+    if (cart[id].qty > p.quantity) cart[id].qty = p.quantity;
+  }
+  saveCart();
+}
+
+function renderAll() { renderCats(); renderGrid(); renderCart(); renderRecent(); }
+
+function renderCats() {
+  const cats = [...new Set(products.map((p) => p.category).filter(Boolean))].sort();
+  if (cat !== 'all' && !cats.includes(cat)) cat = 'all';
+  $('cats').hidden = !cats.length;
+  $('cats').innerHTML = ['all', ...cats].map((c) => `<button class="chip" data-cat="${esc(c)}" aria-pressed="${c === cat}">${c === 'all' ? 'Hammasi' : esc(c)}</button>`).join('');
+}
+function visible() {
+  const s = q.toLowerCase();
+  return products
+    .filter((p) => (cat === 'all' || p.category === cat) && (!s || p.name.toLowerCase().includes(s) || (p.category || '').toLowerCase().includes(s)))
+    .sort((a, b) => (b.quantity > 0) - (a.quantity > 0) || a.name.localeCompare(b.name));
+}
+function renderGrid() {
+  const list = visible();
+  if (!list.length) {
+    $('grid').innerHTML = `<div class="empty" style="grid-column:1/-1">${products.length ? 'Hech narsa topilmadi.' : 'Hali tovar kiritilmagan.<br><a class="btn brass" href="/input">Tovar kiritish</a>'}</div>`;
+    return;
+  }
+  $('grid').innerHTML = list.map((p) => `
+    <button class="pc ${p.quantity <= p.minStock ? 'low' : ''}" data-id="${p._id}" ${p.quantity <= 0 ? 'disabled' : ''}>
+      ${cart[p._id] ? `<span class="inc">${fmt(cart[p._id].qty)}</span>` : ''}
+      <span class="nm">${esc(p.name)}</span>
+      ${p.category ? `<span class="ct">${esc(p.category)}</span>` : ''}
+      <span class="pr">${fmt(p.sellPrice)}</span>
+      <span class="st">${p.quantity <= 0 ? 'Tugagan' : 'Qoldi: ' + fmt(p.quantity)}</span>
+    </button>`).join('');
+}
+$('cats').addEventListener('click', (e) => { const b = e.target.closest('[data-cat]'); if (!b) return; cat = b.dataset.cat; renderCats(); renderGrid(); });
+$('grid').addEventListener('click', (e) => { const b = e.target.closest('.pc'); if (b) addToCart(products.find((p) => p._id === b.dataset.id)); });
+
+$('search').addEventListener('input', (e) => { q = e.target.value.trim(); renderGrid(); });
+$('search').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') { e.target.value = ''; q = ''; renderGrid(); return; }
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const avail = visible().filter((p) => p.quantity > 0);
+  const exact = avail.filter((p) => p.name.toLowerCase() === q.toLowerCase());
+  const pick = avail.length === 1 ? avail[0] : exact.length === 1 ? exact[0] : null;
+  if (!pick) return toast(avail.length ? 'Bir nechta tovar topildi, birini bosing' : 'Tovar topilmadi', true);
+  addToCart(pick);
+  e.target.value = ''; q = ''; renderGrid();
+});
+
+function addToCart(p) {
+  if (!p || p.quantity <= 0) return;
+  const line = cart[p._id];
+  if (line) {
+    if (line.qty >= p.quantity) return toast(`Omborda faqat ${fmt(p.quantity)} ta bor`, true);
+    line.qty = Math.min(p.quantity, line.qty + 1);
+  } else {
+    cart[p._id] = { name: p.name, qty: 1, price: p.sellPrice, max: p.quantity };
+  }
+  cartChanged();
+}
+function cartChanged() { saveCart(); renderCart(); renderGrid(); }
+const cartTotal = () => Object.values(cart).reduce((a, c) => a + (+c.qty || 0) * (+c.price || 0), 0);
+
+function renderCart() {
+  const ids = Object.keys(cart);
+  $('cartCount').textContent = ids.length ? `${ids.length} xil` : '';
+  $('clearBtn').hidden = !ids.length;
+  $('cartItems').innerHTML = ids.length ? ids.map((id) => {
+    const c = cart[id];
+    return `<div class="ci" data-id="${id}">
+      <div class="ci-top"><b>${esc(c.name)}</b><button class="x" data-act="rm" aria-label="Olib tashlash">&times;</button></div>
+      <div class="ci-row">
+        <div class="qs"><button data-act="dec" aria-label="Kamaytirish">&minus;</button><input class="qi" data-f="qty" type="number" min="0" step="any" value="${c.qty}" inputmode="decimal" aria-label="Soni"><button data-act="inc" aria-label="Ko'paytirish">+</button></div>
+        <span class="op">&times;</span>
+        <input class="qi pi" data-f="price" type="number" min="0" step="any" value="${c.price}" inputmode="decimal" aria-label="Narxi (1 dona)">
+        <span class="lt num" data-lt>${fmt(c.qty * c.price)}</span>
+      </div></div>`;
+  }).join('') : '<div class="cart-empty">Savat bo\'sh. Tovarni bosing yoki nomini yozing.</div>';
+  updateTotals();
+}
+function updateTotals() {
+  const n = Object.keys(cart).length, t = cartTotal();
+  $('cartTotal').textContent = money(t);
+  $('payBtn').disabled = !n;
+  $('fab').hidden = !n;
+  $('fabTxt').textContent = `${n} xil, ${money(t)}`;
+}
+
+$('cartItems').addEventListener('click', (e) => {
+  const b = e.target.closest('button[data-act]'); if (!b) return;
+  const id = b.closest('.ci').dataset.id, c = cart[id];
+  if (b.dataset.act === 'rm') delete cart[id];
+  if (b.dataset.act === 'inc') { if (c.qty >= c.max) return toast(`Omborda faqat ${fmt(c.max)} ta bor`, true); c.qty = Math.min(c.max, c.qty + 1); }
+  if (b.dataset.act === 'dec') { c.qty -= 1; if (c.qty <= 0) delete cart[id]; }
+  cartChanged();
+});
+$('cartItems').addEventListener('input', (e) => {
+  const f = e.target.dataset.f; if (!f) return;
+  const row = e.target.closest('.ci'), c = cart[row.dataset.id];
+  c[f] = parseFloat(e.target.value) || 0;
+  row.querySelector('[data-lt]').textContent = fmt(c.qty * c.price);
+  updateTotals();
+});
+$('cartItems').addEventListener('change', (e) => {
+  const f = e.target.dataset.f; if (!f) return;
+  const id = e.target.closest('.ci').dataset.id, c = cart[id];
+  if (f === 'qty') {
+    if (c.qty > c.max) { c.qty = c.max; toast(`Omborda faqat ${fmt(c.max)} ta bor`, true); }
+    if (c.qty <= 0) delete cart[id];
+  }
+  cartChanged();
+});
+$('clearBtn').addEventListener('click', () => { cart = {}; cartChanged(); $('search').focus(); });
+$('fab').addEventListener('click', () => $('cart').scrollIntoView({ behavior: 'smooth' }));
+
+$('payBtn').addEventListener('click', async () => {
+  const items = Object.entries(cart).map(([productId, c]) => ({ productId, quantity: +c.qty, price: c.price === '' ? undefined : +c.price }));
+  if (items.some((i) => !(i.quantity > 0))) return toast('Sonini tekshiring', true);
+  $('payBtn').disabled = true;
+  try {
+    const r = await api('/api/checkout', 'POST', { items });
+    toast(`Sotildi: ${money(r.total)}`);
+    cart = {}; saveCart();
+    await refresh();
+    showReceipt({ key: r.receipt, time: r.sales[0]?.createdAt || new Date().toISOString(), lines: r.sales });
+  } catch (e) {
+    toast(e.message, true);
+    await refresh();
+  }
+});
+
+function todayReceipts() {
+  const from = startOfToday(), map = new Map();
+  for (const s of sales) {
+    if (new Date(s.createdAt) < from) continue;
+    const key = s.receipt || s._id;
+    if (!map.has(key)) map.set(key, { key, kind: s.receipt ? 'receipt' : 'sale', time: s.createdAt, lines: [] });
+    map.get(key).lines.push(s);
+  }
+  return [...map.values()].sort((a, b) => new Date(b.time) - new Date(a.time));
+}
+function renderRecent() {
+  const list = todayReceipts();
+  $('todayRev').textContent = money(list.reduce((a, r) => a + r.lines.reduce((x, l) => x + l.quantity * l.sellPrice, 0), 0));
+  $('recent').innerHTML = list.length ? list.map((r) => {
+    const total = r.lines.reduce((x, l) => x + l.quantity * l.sellPrice, 0);
+    return `<div class="tr" data-key="${r.key}" data-kind="${r.kind}">
+      <div class="num" style="color:var(--muted)">${hhmm(r.time)}</div>
+      <div class="items">${r.lines.map((l) => `${esc(l.productName)} &times;${fmt(l.quantity)}`).join(', ')}</div>
+      <div class="num" style="font-weight:700;text-align:right">${money(total)}</div>
+      <div class="acts"><button class="btn sm" data-chek>Chek</button><button class="btn sm danger" data-undo>Bekor qilish</button></div></div>`;
+  }).join('') : '<div class="empty">Bugun hali sotuv bo\'lmadi.</div>';
+}
+$('recent').addEventListener('click', async (e) => {
+  const row = e.target.closest('.tr'); if (!row) return;
+  if (e.target.closest('[data-chek]')) {
+    const r = todayReceipts().find((x) => String(x.key) === row.dataset.key);
+    if (r) showReceipt(r);
+    return;
+  }
+  if (!e.target.closest('[data-undo]')) return;
+  if (!confirm('Sotuv bekor qilinsinmi? Tovar omborga qaytadi.')) return;
+  try {
+    await api((row.dataset.kind === 'receipt' ? '/api/receipts/' : '/api/sales/') + row.dataset.key, 'DELETE');
+    toast('Sotuv bekor qilindi, tovar omborga qaytdi');
+    refresh();
+  } catch (err) { toast(err.message, true); }
+});
+
+const SHOP_DEFAULT = { name: "Web Do'kon", address: '', phone: '', hours: '', footer: 'Xaridingiz uchun rahmat!', width: '80', auto: false };
+function shop() {
+  try { return { ...SHOP_DEFAULT, ...(JSON.parse(localStorage.getItem('dokon_shop')) || {}) }; } catch { return { ...SHOP_DEFAULT }; }
+}
+let currentReceipt = null;
+
+function receiptHTML(r) {
+  const s = shop(), d = new Date(r.time);
+  const date = `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+  const time = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  const total = r.lines.reduce((a, l) => a + l.quantity * l.sellPrice, 0);
+  const no = String(r.key).slice(-6).toUpperCase();
+  return `<div class="rc">
+    <div class="rc-h"><b>${esc(s.name)}</b>${s.address ? `<div>${esc(s.address)}</div>` : ''}${s.phone ? `<div>Tel: ${esc(s.phone)}</div>` : ''}${s.hours ? `<div>Ish vaqti: ${esc(s.hours)}</div>` : ''}</div>
+    <hr>
+    <div class="rc-row"><span>Chek: ${no}</span></div>
+    <div class="rc-row"><span>Sana: ${date}</span><span>Soat: ${time}</span></div>
+    <hr>
+    ${r.lines.map((l) => `<div class="rc-item"><div>${esc(l.productName)}</div><div class="rc-row"><span>${fmt(l.quantity)} x ${fmt(l.sellPrice)}</span><span>${fmt(l.quantity * l.sellPrice)}</span></div></div>`).join('')}
+    <hr>
+    <div class="rc-row rc-total"><span>JAMI</span><span>${money(total)}</span></div>
+    <hr>
+    <div class="rc-f">${esc(s.footer)}</div>
+  </div>`;
+}
+function showReceipt(r) {
+  currentReceipt = r;
+  $('rcPreview').innerHTML = receiptHTML(r);
+  $('dlgReceipt').showModal();
+  if (shop().auto) setTimeout(printReceipt, 250);
+}
+function printReceipt() {
+  if (!currentReceipt) return;
+  const w = shop().width === '58' ? 58 : 80;
+  $('printArea').innerHTML = receiptHTML(currentReceipt);
+  $('pageStyle').textContent = `@page{size:${w}mm auto;margin:3mm} #printArea{width:${w - 8}mm}`;
+  window.print();
+}
+$('printBtn').addEventListener('click', printReceipt);
+$('dlgReceipt').addEventListener('close', () => $('search').focus());
+
+$('settingsBtn').addEventListener('click', () => {
+  const s = shop();
+  $('setName').value = s.name; $('setAddr').value = s.address; $('setPhone').value = s.phone;
+  $('setHours').value = s.hours; $('setFooter').value = s.footer; $('setWidth').value = s.width; $('setAuto').checked = !!s.auto;
+  $('dlgSettings').showModal();
+});
+$('fSettings').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = { name: $('setName').value.trim() || SHOP_DEFAULT.name, address: $('setAddr').value.trim(), phone: $('setPhone').value.trim(), hours: $('setHours').value.trim(), footer: $('setFooter').value.trim(), width: $('setWidth').value, auto: $('setAuto').checked };
+  try { localStorage.setItem('dokon_shop', JSON.stringify(data)); toast('Chek sozlamalari saqlandi'); }
+  catch { toast('Saqlab bo\'lmadi', true); }
+  $('dlgSettings').close();
+});
+
+refresh();
+setInterval(() => { if (!document.activeElement?.closest?.('#cartItems')) refresh(); }, 60000);
+</script>
+</body>
+</html>
